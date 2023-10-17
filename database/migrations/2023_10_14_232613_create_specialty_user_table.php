@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('specialties_user', function (Blueprint $table) {
-            $table->id();
-
+        Schema::create('specialty_user', function (Blueprint $table) {
+            $table->bigIncrements('id');
             //enfermera
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            // specialty
+            //Specialty
             $table->unsignedBigInteger('specialties_id');
             $table->foreign('specialties_id')->references('id')->on('specialties')->onDelete('cascade');
+
 
             $table->timestamps();
         });
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('specialties_user');
+        Schema::dropIfExists('specialty_user');
     }
 };

@@ -57,6 +57,7 @@ class CreateNewUser implements CreatesNewUsers
                 'email' => $input['email'],
                 'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
                 'password' => Hash::make($input['password']),
+                'role' => 'paciente'
             ]);
 
             $persona = new Persona([

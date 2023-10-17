@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Superadmin;
 
 use Illuminate\Http\Request;
 use App\Models\Enfermera;
@@ -8,6 +8,8 @@ use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+use App\Models\Especialidad;
 
 class EnfermeraController extends Controller
 {
@@ -19,7 +21,8 @@ class EnfermeraController extends Controller
 
     public function create()
     {
-        return view('enfermeras.create');
+        $specialties = Especialidad::all();
+        return view('enfermeras.create', compact('specialties'));
     }
 
     public function store(Request $request)
@@ -53,6 +56,7 @@ class EnfermeraController extends Controller
             'role' => 'enfermera',
         ]);
 
+
         $user->save();
 
         $persona = new Persona([
@@ -79,10 +83,11 @@ class EnfermeraController extends Controller
         $cargaHoraria = $request->input('carga_Horaria'); // Asigna la carga horaria antes de crear $enfermera
 
         $enfermera = new Enfermera([
-            'especialidad' => $request->input('especialidad'),
+
             'curriculoVitae' => null,
             'carga_Horaria' => $cargaHoraria, // Asigna carga_Horaria aquí
         ]);
+        $enfermera->specialties()->attach($request->input('specialties'));
 
         if ($request->hasFile('curriculoVitae')) {
             $cvFile = $request->file('curriculoVitae');
@@ -106,8 +111,11 @@ class EnfermeraController extends Controller
 
     public function edit($id)
     {
+
         $enfermera = Enfermera::findOrFail($id);
-        return view('enfermeras.edit', compact('enfermera'));
+        $specialties = Especialidad::all();
+        $specialty_ids = $enfermera->specialtines()->pluck('specialties.id');
+        return view('enfermeras.edit', compact('enfermera', 'specialtines', '$specialty_ids'));
     }
 
     public function update(Request $request, $id)
@@ -165,7 +173,7 @@ class EnfermeraController extends Controller
 
         $persona->save();
 
-        $enfermera->especialidad = $request->input('especialidad');
+        $enfermera->specialties()->sync($request->input('specialties'));
         $enfermera->carga_Horaria = $request->input('carga_Horaria');
 
         if ($request->hasFile('curriculoVitae')) {

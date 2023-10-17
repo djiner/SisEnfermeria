@@ -1,9 +1,16 @@
 @extends('layouts.panel')
 
 @section('content')
+
+@section('styles')
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+@endsection
+
 <div class="header bg-gradient-primary pb-6 pt-3 pt-md-6">
     <!-- Puedes agregar contenido adicional al encabezado si es necesario -->
 </div>
+
 
 <div class="container-fluid mt--7">
     <div class="row justify-content-center">
@@ -191,8 +198,13 @@
                         </div>
                         <h6 class="heading-small text-muted mb-4">Información de Enfermera</h6>
                         <div class="form-group">
-                            <label for="input-especialidad">Especialidad</label>
-                            <input type="text" name="especialidad" id="input-especialidad" class="form-control" placeholder="Especialidad" value="{{ old('especialidad') }}" required>
+                            <label for="specialties">Especialidades</label>
+                            <select name="specialties[]" id="specialties" class="form-control selectpicker"
+                            data-style="btn-primary" title="Seleccionar especialidades" multiple required>
+                                @foreach ($specialties as $especialidad)
+                                    <option value="{{ $especialidad->id }}">{{ $especialidad->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="input-cargaHoraria">Carga Horaria</label>
@@ -229,4 +241,10 @@
         </div>
     </div>
 </div>
+@endsection
+@section('scripts')
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
 @endsection

@@ -3,48 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Interfaces\HorarioServicioInterface;
-
+use App\Interfaces\HorarioServiceInterface;
+use App\Models\JornadaLaboral;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class HorarioController extends Controller
 {
+    public function hours(Request $request, HorarioServiceInterface $horarioServiceInterface){
 
-    public function horas(Request $request, HorarioServicioInterface $horarioServicio)
-    {
-        $reglas = [
-            'fecha' => 'required|date_format:"Y-m-d"',
-            'id_enfermera' => 'required|exists:users,id'
+        $rules = [
+            'date' => 'required|date_format:"Y-m-d"',
+            'enfermera_id' => 'required|exists:users,id'
         ];
-        $request->validate($reglas);
+        $this->validate($request, $rules);
 
-        $fecha = $request->input('fecha');
-        $enfermeraId = $request->input('id_enfermera');
+        $date = $request->input('date');
+        $enfermeraId = $request->input('enfermera_id');
 
-        return $horarioServicio->getAvailableIntervals($fecha, $enfermeraId);
+        return $horarioServiceInterface->getAvailableIntervals($date, $enfermeraId);
     }
 
-
-    /*
-    private function obtenerIntervalos($inicio, $fin) {
-        $inicio = new Carbon($inicio);
-        $fin = new Carbon($fin);
-
-        $intervalos = [];
-
-        while ($inicio < $fin) {
-            $intervalo = [];
-
-            $intervalo['inicio']  = $inicio->format('g:i A');
-            $inicio->addMinutes(30);
-            $intervalo['fin']  = $inicio->format('g:i A');
-
-            $intervalos []= $intervalo;
-        }
-
-        return $intervalos;
-    }
-    */
 
 }

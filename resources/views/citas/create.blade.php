@@ -37,7 +37,7 @@
                     @endif
 
                     <div class="panel-body formregistros" style="margin: 20px;">
-                        <form action="{{ url('citas') }}" method="post">
+                        <form action="{{ url('reservarcitas') }}" method="post">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -68,7 +68,7 @@
 
                                 <div class="form-group col-lg-5 col-md-5 col-sm-5 col-xs-12">
                                     <label for="email">Enfermera</label>
-                                    <select name="doctor_id" id="doctor" required class="form-control selectpicker" data-live-search="true" data-style="btn-inverse">
+                                    <select name="enfermera_id" id="enfermera" required class="form-control selectpicker" data-live-search="true" data-style="btn-inverse">
                                         @foreach ($enfermeras as $enfermera)
                                         <option value="{{ $enfermera->id }}" @if(old('nurses_id') == $enfermera->id) selected @endif>{{ $enfermera->name }}</option>
                                         @endforeach
@@ -114,20 +114,20 @@
                                 </div>
 
                                 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label for="type">Tipo de consulta</label>
+                                    <label for="type">Tipo de Servicio</label>
                                     <div class="custom-control custom-radio mb-3">
                                         <input name="type" class="custom-control-input" id="type1" type="radio"
-                                            @if(old('type', 'Consulta') == 'Consulta') checked @endif value="Consulta">
+                                            @if(old('type', 'Cuidados') == 'Cuidados') checked @endif value="Consulta">
                                         <label class="custom-control-label" for="type1">Cuidados</label>
                                     </div>
                                     <div class="custom-control custom-radio mb-3">
                                         <input name="type" class="custom-control-input" id="type2" type="radio"
-                                            @if(old('type') == 'Examen') checked @endif value="Examen">
+                                            @if(old('type') == 'Curacion') checked @endif value="Curacion">
                                         <label class="custom-control-label" for="type2">Curacion</label>
                                     </div>
                                     <div class="custom-control custom-radio mb-3">
                                         <input name="type" class="custom-control-input" id="type3" type="radio"
-                                            @if(old('type') == 'Operación') checked @endif value="Operación">
+                                            @if(old('type') == 'Inyeccion') checked @endif value="Inyeccion">
                                         <label class="custom-control-label" for="type3">Inyectables</label>
                                     </div>
                                 </div>

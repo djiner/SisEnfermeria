@@ -17,6 +17,6 @@ class JornadaLaboral extends Model
         'fin_manana',
         'inicio_tarde',
         'fin_tarde',
-        'enfermera_id'
+        'user_id'
     ];
 }

@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
     {
 
             $this->call(SuperadminSeeder::class); // Ejecuta SuperadminSeeder después
+            $this->call(SpecialtiesTableSeeder::class);
+
     }
 }
 

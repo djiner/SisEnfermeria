@@ -1,193 +1,179 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Interfaces\HorarioServiceInterface;
+use App\Models\CancelarCita;
 use App\Models\Cita;
-use App\Models\Paciente;
-use App\Models\Enfermera;
 use App\Models\Especialidad;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Interfaces\HorarioServicioInterface;
-use Carbon\Carbon;
 
-
-class CitaController extends Controller
+class AppointmentController extends Controller
 {
-    public function index()
-    {
+
+    public function index(){
+
         $role = auth()->user()->role;
 
-        if ($role == 'admin') {
-            $pendienteCitas = Cita::where('estado', 'Reservada')->paginate(15);
-            $confirmarCitas = Cita::where('estado', 'Confirmada')->paginate(15);
-            $historialCitas = Cita::whereIn('estado', ['Atendida', 'Cancelada'])->paginate(15);
-        } elseif ($role == 'enfermera') {
-            $userId = auth()->id();
-            $pendienteCitas = Cita::where('estado', 'Reservada')->where('nurses_id', $userId)->paginate(15);
-            $confirmarCitas = Cita::where('estado', 'Confirmada')->where('nurses_id', $userId)->paginate(15);
-            $historialCitas = Cita::whereIn('estado', ['Atendida', 'Cancelada'])->where('nurses_id', $userId)->paginate(15);
-        } elseif ($role == 'paciente') {
-            $userId = auth()->id();
-            $pendienteCitas = Cita::where('estado', 'Reservada')->where('patients_id', $userId)->paginate(15);
-            $confirmarCitas = Cita::where('estado', 'Confirmada')->where('patients_id', $userId)->paginate(15);
-            $historialCitas = Cita::whereIn('estado', ['Atendida', 'Cancelada'])->where('patients_id', $userId)->paginate(15);
+        if($role == 'admin'){
+            //Admin
+            $confirmarcitas = Cita::all()
+            ->where('status', 'Confirmada');
+            $pendientecitas = Cita::all()
+            ->where('status', 'Reservada');
+            $historialcitas = Cita::all()
+            ->whereIn('status', ['Atendida','Cancelada']);
+        }elseif($role == 'enfermera'){
+            //Doctor
+            $confirmarcitas = Cita::all()
+            ->where('status', 'Confirmada')
+            ->where('enfermera_id', auth()->id());
+            $pendientecitas = Cita::all()
+            ->where('status', 'Reservada')
+            ->where('enfermera_id', auth()->id());
+            $historialcitas = Cita::all()
+            ->whereIn('status', ['Atendida','Cancelada'])
+            ->where('enfermera_id', auth()->id());
+        }elseif($role == 'paciente'){
+            //Pacientes
+            $confirmarcitas= Cita::all()
+            ->where('status', 'Confirmada')
+            ->where('patient_id', auth()->id());
+            $pendientecitas = Cita::all()
+            ->where('status', 'Reservada')
+            ->where('patient_id', auth()->id());
+            $historialcitas = Cita::all()
+            ->whereIn('status', ['Atendida','Cancelada'])
+            ->where('patient_id', auth()->id());
         }
 
-        return view('citas.index', compact('pendienteCitas', 'confirmarCitas', 'historialCitas', 'role'));
+
+        return view('citas.index',
+        compact('confirmarcitas', 'pendientecitas', 'historialcitas', 'role') );
     }
 
-public function create(HorarioServicioInterface $HorarioCitas)
-{
-    $specialties = Especialidad::all();
-    $role = auth()->user()->role;
+    public function create(HorarioServiceInterface $horarioServiceInterface) {
+        $specialties = Especialidad::all();
 
-    $specialtyId = old('specialties_id');
-    if ($specialtyId) {
-        $specialty = Especialidad::find($specialtyId);
-        $enfermeras = $specialty->users;
-    } else {
-        $enfermeras = collect();
-    }
-
-    $pacientes = User::Pacientes()->get();
-
-    $date = old('horario_date');
-    $enfermeraId = old('nurses_id');
-    if ($date && $enfermeraId) {
-        $intervals = $HorarioCitas->getAvailableIntervals($date, $enfermeraId);
-    } else {
-        $intervals = null;
-    }
-
-    return view('citas.create', compact('specialties', 'enfermeras', 'intervals', 'pacientes', 'role'));
-}
-
-public function store(Request $request, HorarioServicioInterface $HorarioCitas)
-{
-    $role = auth()->user()->role;
-
-    if ($role == 'admin') {
-        $rules = [
-            'description' => 'required',
-            'specialties_id' => 'exists:especialidads,id',
-            'nurses_id' => 'exists:users,id',
-            'patients_id' => 'exists:users,id',
-            'horario_time' => 'required',
-        ];
-    } else {
-        $rules = [
-            'description' => 'required',
-            'specialties_id' => 'exists:especialidads,id',
-            'nurses_id' => 'exists:users,id',
-            'horario_time' => 'required',
-        ];
-    }
-
-    $messages = ['horario_time.required' => 'Por favor seleccione una hora válida para su cita'];
-
-    $validator = Validator::make($request->all(), $rules, $messages);
-
-    $validator->after(function ($validator) use ($request, $HorarioCitas) {
-        $date = $request->input('horario_date');
-        $enfermeraId = $request->input('nurses_id');
-        $horario_time = $request->input('horario_time');
-        if ($date && $enfermeraId && $horario_time) {
-            $start = new Carbon($horario_time);
+        $specialtyId = old('specialty_id');
+        if ($specialtyId) {
+            $specialty = Especialidad::find($specialtyId);
+            $enfermeras = $specialty->users;
         } else {
-            return;
+            $especialidad = collect();
         }
 
-        if (!$HorarioCitas->isAvailableInterval($date, $enfermeraId, $start)) {
-            $validator->errors()->add('available_time', 'La hora seleccionada ya se encuentra reservada por otro paciente.');
-        }
-    });
-
-    if ($validator->fails()) {
-        return back()
-            ->withErrors($validator)
-            ->withInput();
-    }
-
-    $data = $request->only([
-        'description',
-        'speciaties_id',
-        'nurses_id',
-        'horario_date',
-        'horario_time',
-        'type',
-    ]);
-
-    if ($role == 'admin') {
-        $data['pacients_id'] = $request->input('pacients_id');
-    } else {
-        $data['pacients_id'] = auth()->id();
-    }
-
-    // Formato correcto para la hora
-    $carbonTime = Carbon::createFromFormat('g:i A', $data['horario_time']);
-    $data['horario_time'] = $carbonTime->format('H:i:s');
-    Cita::create($data);
-    $notification = 'La cita se ha registrado correctamente';
-    return redirect('/citas')->with(compact('notification'));
-}
-
-
-
-
-   /*public function showCancelForm(Appointment $appointment)
-    {
-        if ($appointment->status == 'Confirmada') {
-            $role = auth()->user()->role;
-            return view('appointments.cancel', compact('appointment', 'role'));
+        $date = old('horario_date');
+        $enfermeraId = old('enfermera_id');
+        if ($date && $enfermeraId) {
+            $intervals = $horarioServiceInterface->getAvailableIntervals($date, $enfermeraId);
+        }else {
+            $intervals = null;
         }
 
-        return redirect('/appointments');
+        return view('citas.create', compact('specialties', 'enfermera', 'intervals'));
     }
 
-    public function postCancel(Appointment $appointment, Request $request)
-    {
-        if ($request->has('justification')) {
-            $cancellation = new CancelledAppointment();
+    public function store(Request $request, HorarioServiceInterface $horarioServiceInterface) {
+
+        $rules = [
+            'scheduled_time' => 'required',
+            'type' => 'required',
+            'description' => 'required',
+            'enfermera_id' => 'exists:users,id',
+            'specialty_id' => 'exists:specialties,id'
+        ];
+
+        $messages = [
+            'scheduled_time.required' => 'Debe seleccionar una hora para su cita.',
+            'type.required' => 'Debe seleccionar el tipo de consulta.',
+            'description.required' => 'Debe poner sus síntomas.'
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        $validator->after(function ($validator) use ($request, $horarioServiceInterface) {
+
+            $date = $request->input('horario_date');
+            $enfermeraId = $request->input('enfermera_id');
+            $horario_time = $request->input('horario_time');
+            if ($date && $enfermeraId && $horario_time) {
+                $start = new Carbon($horario_time);
+            }else {
+                return;
+            }
+
+            if (!$horarioServiceInterface->isAvailableInterval($date, $enfermeraId, $start)) {
+                $validator->errors()->add(
+                    'available_time', 'La hora seleccionada ya se encuentra reservada por otro paciente.'
+                );
+            }
+        });
+
+        if ($validator->fails()) {
+            return back()
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        $data = $request->only([
+            'horario_date',
+            'horario_time',
+            'type',
+            'description',
+            'nurse_id',
+            'specialty_id'
+        ]);
+        $data['patient_id'] = auth()->id();
+
+        $carbonTime = Carbon::createFromFormat('g:i A', $data['horario_time']);
+        $data['horario_time'] = $carbonTime->format('H:i:s');
+
+        Cita::create($data);
+
+        $notification = 'La cita se ha realizado correctamente.';
+        return redirect('/miscitas')->with(compact('notification'));
+    }
+
+    public function cancel(Cita $cita, Request $request) {
+
+        if($request->has('justification')){
+            $cancellation = new CancelarCita();
             $cancellation->justification = $request->input('justification');
             $cancellation->cancelled_by_id = auth()->id();
-            // $cancellation->appointment_id = ;
-            // $cancellation->save();
 
-            $appointment->cancellation()->save($cancellation);
+            $cita->cancellation()->save($cancellation);
         }
 
-        $appointment->status = 'Cancelada';
-        $saved = $appointment->save(); // update
-
-        if ($saved)
-            $appointment->patient->sendFCM('Su cita ha sido cancelada.');
-
+        $cita->status = 'Cancelada';
+        $cita->save();
         $notification = 'La cita se ha cancelado correctamente.';
-        return redirect('/appointments')->with(compact('notification'));
+
+        return redirect('/miscitas')->with(compact('notification'));
     }
 
-    public function postConfirm(Appointment $appointment)
-    {
-        $appointment->status = 'Confirmada';
-        $saved = $appointment->save(); // update
+    public function confirm(Cita $cita) {
 
-        if ($saved)
-            $appointment->patient->sendFCM('Su cita se ha confirmado!');
-
+        $cita->status = 'Confirmada';
+        $cita->save();
         $notification = 'La cita se ha confirmado correctamente.';
-        return redirect('/appointments')->with(compact('notification'));
+
+        return redirect('/miscitas')->with(compact('notification'));
     }
 
+    public function formCancel(Cita $cita) {
+        if($cita->status == 'Confirmada' || 'Reservada'){
+            $role = auth()->user()->role;
+            return view('citas.cancel', compact('cita', 'role'));
+        }
+        return redirect('/miscitas');
 
-    public function show(citas $citas)
-    {
+    }
+
+    public function show(Cita $cita){
         $role = auth()->user()->role;
-        return view('appointments.show', compact('appointment', 'role'));
-    }*/
-
-
+        return view('citas.show', compact('cita', 'role'));
+    }
 }

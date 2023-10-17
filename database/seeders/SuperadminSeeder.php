@@ -66,7 +66,11 @@ class SuperadminSeeder extends Seeder
 
         // Asignar el usuario al campo 'user_id' en Persona
         $persona->user()->associate($user);
-        $persona->save();
+        $persona->save();User::factory()
+
+        ->count(10)
+        ->state(['role' => 'admin'])
+        ->create();
 
         // Crear el usuario correspondiente
         $user = User::create([
@@ -93,6 +97,11 @@ class SuperadminSeeder extends Seeder
         // Asignar el usuario al campo 'user_id' en Persona
         $persona->user()->associate($user);
         $persona->save();
+
+        User::factory()
+            ->count(10)
+            ->state(['role' => 'enfermera'])
+            ->create();
 
         // Crear el usuario correspondiente
         $user = User::create([

@@ -11,10 +11,15 @@ class Especialidad extends Model
     protected $table = 'specialties';
     protected $fillable = ['nombre', 'descripcion']; // Campos que se pueden llenar.
 
-    // $specialty->users
+        public function enfermera()
+    {
+        return $this->hasMany(Enfermera::class);
+    }
+
+
     public function users()
     {
-    	return $this->belongsToMany(User::class,'specialties_user')->withTimestamps();
+        return $this->belongsToMany(User::class);
     }
 }
 

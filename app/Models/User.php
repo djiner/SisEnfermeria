@@ -45,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
+        'pivot'
     ];
 
     /**
@@ -61,6 +62,28 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array<int, string>
      */
+    public function scopePaciente($query){
+        return $query->where('role', 'paciente');
+    }
+    public function scopeEnfermera($query){
+        return $query->where('role', 'enfermera');
+    }
+
+    public function asDoctorAppointments(){
+        return $this->hasMany(Appointment::class, 'doctor_id');
+    }
+    public function attendedAppointments(){
+        return $this->asDoctorAppointments()->where('status', 'Atendida');
+    }
+    public function cancellAppointments(){
+        return $this->asDoctorAppointments()->where('status', 'Cancelada');
+    }
+
+    public function asPatientAppointments(){
+        return $this->hasMany(Appointment::class, 'patient_id');
+    }
+
+
     public function persona(): hasOne
     {
         return $this->hasOne(Persona::class);
@@ -69,9 +92,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(Enfermera::class);
     }
-    public function specialties(): belongsTo
+    public function specialties()
     {
-        return $this->belongsTo(Especialidad::class);
+        return $this->belongsToMany(Especialidad::class);
     }
 
 

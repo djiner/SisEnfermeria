@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('work_days', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedSmallInteger('día');
             $table->boolean('activo');
             $table->time('inicio_mañana');
             $table->time('fin_mañana');
-            $table->time('tarde_inicio');
+            $table->time('inicio_tarde');
             $table->time('fin_tarde');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

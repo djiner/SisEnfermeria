@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('locations', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('nombre', 100);
             $table->decimal('Latitud', 9, 6);
             $table->decimal('Longitud', 9, 6);

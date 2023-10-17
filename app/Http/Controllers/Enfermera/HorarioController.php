@@ -15,7 +15,7 @@ class HorarioController extends Controller
     ];
 
     public function edit(){
-        $jornadasLaborales = JornadaLaboral::where('enfermera_id', auth()->id())->get();
+        $jornadasLaborales = JornadaLaboral::where('user_id', auth()->id())->get();
 
         if (count($jornadasLaborales) > 0) {
             $jornadasLaborales->map(function ($jornadaLaboral)
@@ -24,7 +24,6 @@ class HorarioController extends Controller
                 $jornadaLaboral->fin_manana = (new Carbon($jornadaLaboral->fin_manana))->format('g:i A');
                 $jornadaLaboral->inicio_tarde = (new Carbon($jornadaLaboral->inicio_tarde))->format('g:i A');
                 $jornadaLaboral->fin_tarde = (new Carbon($jornadaLaboral->fin_tarde))->format('g:i A');
-                return $jornadaLaboral;
             });
         } else {
             $jornadasLaborales = collect();
@@ -34,7 +33,7 @@ class HorarioController extends Controller
 
         $dias = $this->dias;
 
-        return view('horario', compact('jornadasLaborales', 'dias'));
+        return view('horario', compact('dias', 'jornadasLaborales'));
     }
 
     public function store(Request $request){

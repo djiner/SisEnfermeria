@@ -60,7 +60,6 @@
         <li><a href="{{ url('usuarios')}}">Usuarios Registrados</a></li>
         <li><a href="{{ url('')}}" >Perfiles de Usuario</a></li>
         <li><a href="{{ url('')}}" >Cambiar Contraseña</a></li>
-        <li><a href="{{ url('')}}" >Roles Usuarios</a></li>
       </ul>
     </div>
 
@@ -73,7 +72,6 @@
             <li><a href="{{ url('enfermeras')}}" >Enfermeras Registradas</a></li>
             <li><a href="{{ url('especialidades')}}" >Especialidad</a></li>
             <li><a href="{{ url('horario')}}" >Horario</a></li>
-            <li><a href="triaje" >Triaje</a></li>
             <li><a href="pacientes" >Historial de pacientes</a></li>
         </ul>
       </div>
@@ -85,12 +83,10 @@
         </button>
 
         <ul class="dropdown-menu" role="menu">
-            <li><a href="{{ url('pacientes')}}" >Pacientes Registrados</a></li>
+            <li><a href="{{ url('pacientes')}}" >Pacientes</a></li>
             <li><a href="citas" >Historial de Citas</a></li>
             <li><a href="citas" >Citas Confirmadas</a></li>
             <li><a href="citas" >citas Programadas</a></li>
-            <li><a href="citas" >Registro de Enfermedades</a></li>
-            <li><a href="enfermeras" >Enfermeras Registradas</a></li>
             <li><a href="citas" >Programar Nueva Cita</a></li>
         </ul>
       </div>
@@ -116,9 +112,7 @@
 
         <ul class="dropdown-menu" role="menu">
             <li><a href="{{ url('citas')}}" >Descripción de Servicios</a></li>
-            <li><a href="pagos" >Tarifas y Opciones de Pago</a></li>
-            <li><a href="enfermera" >Solicitar Servicios Enfermera</a></li>
-            <li><a href="evaluacion" >Evaluación del Servicios</a></li>
+            <li><a href="miscitas" >Solicitar Servicios Enfermera</a></li>
         </ul>
       </div>
 
@@ -156,11 +150,6 @@
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">
-        <i class="far fa-credit-card text-danger"></i> PAGOS
-      </a>
-    </li>
-    <li class="nav-item">
       <a class="nav-link" href="{{ route('logout') }}"
         onclick="event.preventDefault(); document.getElementById('formLogout').submit();">
         <i class="fas fa-sign-in-alt"></i> Cerrar Sesión
@@ -170,7 +159,7 @@
       </form>
     </li>
   </ul>
-
       </ul>
     </div>
   </nav>
+

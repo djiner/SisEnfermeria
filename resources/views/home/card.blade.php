@@ -8,9 +8,9 @@
                     <div class="row">
                     <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Enfermeras</h5>
-                        <span class="fas fa-user-nurse-bold mb-0"></span>
+
                     </div>
-                    <a href="{{ url('/enfermeras') }}">
+                    <a href="{{ url('enfermeras') }}">
                         <div class="col-auto">
                         <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
                         <i class="fas fa-user-nurse"></i>
@@ -28,9 +28,9 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">Pacientes</h5>
-                      <span class="h2 font-weight-bold mb-0"></span>
+
                     </div>
-                      <a href="{{ url('/pacientes') }}">
+                      <a href="{{ url('pacientes') }}">
                         <div class="col-auto">
                       <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
                         <i class="fas fa-wheelchair"></i>
@@ -48,9 +48,9 @@
                     <div class="row">
                       <div class="col">
                         <h5 class="card-title text-uppercase text-muted mb-0">Citas</h5>
-                        <span class="h2 font-weight-bold mb-0"></span>
+
                       </div>
-                      <a href="{{ url('/citas') }}">
+                      <a href="{{ url('citas') }}">
                         <div class="col-auto">
                         <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                           <i class="fas fa-calendar-check"></i>
@@ -68,9 +68,9 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">Servicios</h5>
-                      <span class="h2 font-weight-bold mb-0"></span>
+
                     </div>
-                    <a href="{{ url('/especialidades') }}">
+                    <a href="{{ url('especialidades') }}">
                       <div class="col-auto">
                       <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
                         <i class="fas fa-medkit"></i>

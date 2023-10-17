@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('evaluation_notes', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->date('fecha');
             $table->time('hora');
             $table->text('informe');
